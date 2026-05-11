@@ -48,9 +48,9 @@ Hệ thống **Quản lý Cầm đồ** được xây dựng nhằm số hóa qu
 
 Sơ đồ thực thể - quan hệ (ERD) thể hiện toàn bộ các thực thể, thuộc tính, khóa chính, khóa ngoại và lực lượng quan hệ của hệ thống.
 
-![Sơ đồ ERD - Hệ thống Quản lý Cầm đồ](./images/erd_diagram.png)
-
-> **Ghi chú:** Ảnh trên là sơ đồ ERD được vẽ bằng công cụ draw.io / dbdiagram.io. Các đường nối thể hiện quan hệ 1-N và N-N giữa các thực thể.
+<img width="1377" height="650" alt="Untitled (1)" src="https://github.com/user-attachments/assets/96ccc4c8-c6bd-4a44-8dc3-652789189823" />
+Sơ đồ ERD - Hệ thống Quản lý Cầm đồ
+Ảnh trên là sơ đồ ERD được vẽ bằng công cụ dbdiagram.io. Các đường nối thể hiện quan hệ 1-N và N-N giữa các thực thể.
 
 **Phân tích ERD:**
 
