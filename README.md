@@ -2,8 +2,10 @@
 
 **Môn học:** Hệ Quản Trị Cơ Sở Dữ Liệu  
 **Lớp:** 59KMT  
-**Giảng viên:** Đỗ Duy Cốp  
+**Giảng viên:** Đỗ Duy Cốp
+
 **Họ tên sinh viên:** Từ Văn Hải
+
 **MSSV:** K235480106022 
 
 ## 1. Giới thiệu bài toán
