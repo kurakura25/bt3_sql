@@ -6,29 +6,6 @@
 **Họ tên sinh viên:** Từ Văn Hải
 **MSSV:** K235480106022 
 
----
-
-## Mục lục
-
-1. [Giới thiệu bài toán](#1-giới-thiệu-bài-toán)
-2. [Thiết kế Cơ sở Dữ liệu (Nhiệm vụ 1)](#2-thiết-kế-cơ-sở-dữ-liệu-nhiệm-vụ-1)
-   - [Sơ đồ ERD](#21-sơ-đồ-erd)
-   - [Các bảng dữ liệu và chuẩn hóa 3NF](#22-các-bảng-dữ-liệu-và-chuẩn-hóa-3nf)
-   - [Script tạo bảng (DDL)](#23-script-tạo-bảng-ddl)
-3. [Cài đặt các tính năng cốt lõi (Nhiệm vụ 2)](#3-cài-đặt-các-tính-năng-cốt-lõi-nhiệm-vụ-2)
-   - [Event 1: Đăng ký hợp đồng mới](#event-1-đăng-ký-hợp-đồng-mới)
-   - [Event 2: Tính toán công nợ](#event-2-tính-toán-công-nợ)
-   - [Event 3: Xử lý trả nợ & Hoàn trả tài sản](#event-3-xử-lý-trả-nợ--hoàn-trả-tài-sản)
-   - [Event 4: Truy vấn nợ xấu](#event-4-truy-vấn-nợ-xấu)
-   - [Event 5: Quản lý thanh lý tài sản (Triggers)](#event-5-quản-lý-thanh-lý-tài-sản-triggers)
-4. [Các sự kiện bổ sung](#4-các-sự-kiện-bổ-sung)
-   - [Gia hạn hợp đồng](#41-gia-hạn-hợp-đồng)
-   - [Lịch sử hợp đồng (Audit Log)](#42-lịch-sử-hợp-đồng-audit-log)
-5. [Dữ liệu mẫu (Sample Data)](#5-dữ-liệu-mẫu-sample-data)
-6. [Hướng dẫn chạy Script](#6-hướng-dẫn-chạy-script)
-
----
-
 ## 1. Giới thiệu bài toán
 
 Hệ thống **Quản lý Cầm đồ** được xây dựng nhằm số hóa quy trình vay tiền thế chấp tài sản tại các tiệm cầm đồ. Đây là bài toán quản lý có độ phức tạp cao do các đặc thù nghiệp vụ sau:
@@ -716,7 +693,9 @@ BEGIN
 END;
 GO
 ```
+
 <img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/14097009-6436-44d6-a948-d3470653ae1c" />
+Tính toán công nợ
 
 #### 2.3. Function `fn_CalcMoneyContract`
 
@@ -1164,7 +1143,7 @@ Trạng thái tự động chuyển đổi
 
 > **Phân tích kết quả:** Sau lệnh UPDATE, `trg_AutoQuaHan` kích hoạt và đổi hợp đồng ID=2 thành `'Qua han'`. Ngay trong cùng batch AFTER UPDATE, `trg_AutoSanSangThanhLy` cũng chạy vì `CAST(GETDATE() AS DATE) > Deadline2`, đổi tài sản liên kết sang `'San sang thanh ly'`. Khi UPDATE hợp đồng thành `'Da thanh ly'`, `trg_AutoDaBanThanhLy` kích hoạt và đổi tài sản sang `'Da ban thanh ly'` — điều kiện `deleted.TrangThai <> 'Da thanh ly'` ngăn trigger chạy lặp lại không cần thiết.
 
----
+
 
 ## 4. Các sự kiện bổ sung
 
@@ -1271,8 +1250,7 @@ END;
 GO
 ```
 <img width="1918" height="1078" alt="image" src="https://github.com/user-attachments/assets/6250ea2b-b200-4f3e-873a-7670370d8e9d" />
-
-
+Tạo sp Gia hạn hợp đồng
 **Cách gọi:**
 
 ```sql
@@ -1282,7 +1260,9 @@ EXEC sp_GiaHanHopDong
     @SoNgayGiaHan = 30;
 ```
 
-![Kết quả gia hạn hợp đồng](./images/bonus_gia_han.png)
+<img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/b72445f9-32da-432c-871f-ab6eaa4b0674" />
+
+Kết quả gia hạn hợp đồng
 
 > **Phân tích kết quả:** SSMS trả về `Deadline1Moi` và `Deadline2Moi` tính từ hôm nay + số ngày gia hạn. Khoảng cách `Deadline2 - Deadline1` giữ nguyên so với hợp đồng gốc. Lãi đơn bắt đầu tính lại từ đầu — khách không còn bị tính lãi kép nếu gia hạn đúng hạn. Log gia hạn được ghi rõ ngày, số tiền lãi đã thanh toán và Deadline mới.
 
@@ -1328,182 +1308,8 @@ Lịch sử hợp đồng (Audit Log)
 | Dễ bị gian lận nội bộ | Không thể sửa xóa log mà không để lại dấu vết |
 | Mất dấu vết dòng tiền | Tính lại toàn bộ lịch sử bất kỳ lúc nào |
 
-![Bảng Audit Log - Lịch sử giao dịch hợp đồng](./images/bonus_audit_log.png)
+Bảng lịch sử hiển thị từng giao dịch theo thứ tự thời gian. Tính đúng đắn xác minh được bằng bất biến: `DuNoSau` của dòng thứ n phải bằng `DuNoTruoc` của dòng thứ n+1. Cột `LoaiGiaoDich` phân biệt rõ `'Tra no'`, `'Gia han'` và `'Thanh ly'`.
 
-> **Phân tích kết quả:** Bảng lịch sử hiển thị từng giao dịch theo thứ tự thời gian. Tính đúng đắn xác minh được bằng bất biến: `DuNoSau` của dòng thứ n phải bằng `DuNoTruoc` của dòng thứ n+1. Cột `LoaiGiaoDich` phân biệt rõ `'Tra no'`, `'Gia han'` và `'Thanh ly'`.
 
----
-
-## 5. Dữ liệu mẫu (Sample Data)
-
-```sql
--- Chuyển sang database QuanLyCamDo trước khi chèn dữ liệu mẫu
-USE QuanLyCamDo;
-GO
-
--- -------------------------------------------------------
--- CHÈN DỮ LIỆU MẪU: Nhân viên
--- Thứ tự: NhanVien trước vì HopDong có FK tới NhanVien
--- -------------------------------------------------------
-INSERT INTO NhanVien (HoTen, SoDienThoai, ChucVu) VALUES
--- Nhân viên 1: quản lý cửa hàng
-(N'Nguyen Van An',  N'0901111111', N'Quan ly'),
--- Nhân viên 2: nhân viên thu ngân thường ngày
-(N'Tran Thi Bich',  N'0902222222', N'Nhan vien thu ngan');
-
--- -------------------------------------------------------
--- CHÈN DỮ LIỆU MẪU: Khách hàng
--- Thứ tự: KhachHang trước vì HopDong có FK tới KhachHang
--- -------------------------------------------------------
-INSERT INTO KhachHang (HoTen, CMND_CCCD, SoDienThoai, DiaChi) VALUES
--- Khách hàng 1: sẽ tạo hợp đồng đang trong kỳ lãi đơn
-(N'Le Van Cuong',   N'079201001234', N'0912345678', N'12 Hang Bai, Hoan Kiem, Ha Noi'),
--- Khách hàng 2: sẽ tạo hợp đồng đã quá Deadline1 (nợ xấu)
-(N'Pham Thi Dung',  N'079302005678', N'0987654321', N'45 Nguyen Trai, Thanh Xuan, Ha Noi'),
--- Khách hàng 3: sẽ tạo hợp đồng mới vay
-(N'Hoang Van Em',   N'079103009012', N'0976543210', N'78 Ba Dinh, Ha Noi');
-
--- -------------------------------------------------------
--- CHÈN DỮ LIỆU MẪU: Tài sản thế chấp
--- Thứ tự: TaiSan trước vì HopDong_TaiSan có FK tới TaiSan
--- -------------------------------------------------------
-INSERT INTO TaiSan (TenTaiSan, LoaiTaiSan, GiaTriDinhGia, TrangThai) VALUES
--- Tài sản 1: điện thoại cao cấp (sẽ dùng cho hợp đồng 1)
-(N'iPhone 15 Pro Max 256GB mau den', N'Dien thoai',      18000000, N'Dang cam co'),
--- Tài sản 2: đồng hồ (sẽ dùng cho hợp đồng 1, kết hợp với TaiSan 1)
-(N'Dong ho Casio G-Shock GW-M5610', N'Dong ho',           3500000, N'Dang cam co'),
--- Tài sản 3: xe máy giá trị cao (sẽ dùng cho hợp đồng 2)
-(N'SH 150i bien so 29B1-12345',     N'Xe may',            45000000, N'Dang cam co'),
--- Tài sản 4: laptop (sẽ dùng cho hợp đồng 3)
-(N'Laptop Dell XPS 15 9530',        N'May tinh',          22000000, N'Dang cam co'),
--- Tài sản 5: vàng (sẽ dùng cho hợp đồng 3, kết hợp với TaiSan 4)
-(N'Day chuyen vang 3 chi',          N'Vang bac da quy',   8500000, N'Dang cam co');
-GO
-
--- -------------------------------------------------------
--- CHÈN DỮ LIỆU MẪU: Hợp đồng (gọi qua Stored Procedure)
--- Stored Procedure sẽ tự tạo HopDong + liên kết HopDong_TaiSan
--- -------------------------------------------------------
-
--- Hợp đồng 1: Khách Le Van Cuong vay 15tr, cầm iPhone + đồng hồ
--- Vay 20 ngày trước, Deadline1 = 30 ngày → còn 10 ngày trong kỳ lãi đơn
--- DATEADD(DAY, -20, GETDATE()): lùi ngày hiện tại 20 ngày để giả lập vay từ 20 ngày trước
-EXEC sp_TiepNhanHopDong
-    @KhachHangID = 1,                                          -- Le Van Cuong
-    @NhanVienID  = 1,                                          -- Nguyen Van An tiếp nhận
-    @SoTienVay   = 15000000,                                   -- Vay 15 triệu đồng
-    @NgayVay     = CAST(DATEADD(DAY, -20, GETDATE()) AS DATE), -- Ngày vay = 20 ngày trước
-    @SoNgayDeadline1 = 30,                                     -- Deadline1 sau 30 ngày từ ngày vay
-    @SoNgayDeadline2 = 30,                                     -- Deadline2 sau 30 ngày từ Deadline1
-    @TaiSanIDs   = N'1,2';                                     -- Cầm TaiSan ID 1 và 2
-
--- Hợp đồng 2: Khách Pham Thi Dung vay 30tr, cầm xe SH
--- Vay 45 ngày trước, Deadline1 = 30 ngày → đã quá 15 ngày → đang tính lãi kép
-EXEC sp_TiepNhanHopDong
-    @KhachHangID = 2,                                          -- Pham Thi Dung
-    @NhanVienID  = 2,                                          -- Tran Thi Bich tiếp nhận
-    @SoTienVay   = 30000000,                                   -- Vay 30 triệu đồng
-    @NgayVay     = CAST(DATEADD(DAY, -45, GETDATE()) AS DATE), -- Ngày vay = 45 ngày trước
-    @SoNgayDeadline1 = 30,                                     -- Deadline1 sau 30 ngày → đã qua
-    @SoNgayDeadline2 = 30,                                     -- Deadline2 sau 30 ngày từ Deadline1
-    @TaiSanIDs   = N'3';                                       -- Cầm TaiSan ID 3 (xe SH)
-
--- Hợp đồng 3: Khách Hoang Van Em vay 20tr, cầm laptop + dây chuyền vàng
--- Vay 10 ngày trước, Deadline1 = 30 ngày → còn 20 ngày trong kỳ lãi đơn
-EXEC sp_TiepNhanHopDong
-    @KhachHangID = 3,                                          -- Hoang Van Em
-    @NhanVienID  = 1,                                          -- Nguyen Van An tiếp nhận
-    @SoTienVay   = 20000000,                                   -- Vay 20 triệu đồng
-    @NgayVay     = CAST(DATEADD(DAY, -10, GETDATE()) AS DATE), -- Ngày vay = 10 ngày trước
-    @SoNgayDeadline1 = 30,                                     -- Deadline1 sau 30 ngày
-    @SoNgayDeadline2 = 30,                                     -- Deadline2 sau 30 ngày từ Deadline1
-    @TaiSanIDs   = N'4,5';                                     -- Cầm TaiSan ID 4 và 5
-GO
-```
-
----
-
-## 6. Hướng dẫn chạy Script
-
-### Yêu cầu môi trường
-
-- **Hệ quản trị CSDL:** Microsoft SQL Server 2016 trở lên (yêu cầu `STRING_SPLIT`)
-- **Công cụ:** SQL Server Management Studio (SSMS) 18+ hoặc Azure Data Studio
-- **Quyền hạn:** Tài khoản phải có quyền `CREATE DATABASE`, `CREATE TABLE`, `CREATE PROCEDURE`, `CREATE FUNCTION`, `CREATE TRIGGER`
-
-### Các bước thực hiện
-
-```sql
--- Bước 1: Mở file script_camdo.sql trong SSMS
--- Bước 2: Nhấn F5 hoặc nút Execute để chạy từng batch
-
--- Bước 3: Xác nhận đối tượng đã được tạo đủ
-
--- Kiểm tra danh sách bảng đã tạo trong database QuanLyCamDo
-SELECT TABLE_NAME
-FROM INFORMATION_SCHEMA.TABLES
-WHERE TABLE_CATALOG = 'QuanLyCamDo' AND TABLE_TYPE = 'BASE TABLE';
-
--- Kiểm tra danh sách Stored Procedure đã tạo
-SELECT name AS StoredProcedure
-FROM sys.procedures WHERE type = 'P';
-
--- Kiểm tra danh sách Function đã tạo
--- type 'FN' = scalar function, 'TF' = table-valued function, 'IF' = inline function
-SELECT name AS [Function]
-FROM sys.objects WHERE type IN ('FN', 'TF', 'IF');
-
--- Kiểm tra danh sách Trigger và bảng mà trigger đó gắn vào
--- OBJECT_NAME(parent_id): lấy tên bảng từ ID của bảng cha
-SELECT name AS Trigger, OBJECT_NAME(parent_id) AS OnTable
-FROM sys.triggers;
-```
-
-### Thứ tự chạy trong file script
-
-```
-script_camdo.sql
-├── CREATE DATABASE + GO
-├── USE QuanLyCamDo + GO
-├── CREATE TABLE KhachHang          + GO
-├── CREATE TABLE NhanVien           + GO
-├── CREATE TABLE TaiSan             + GO   ← TaiSan trước HopDong (HopDong_TaiSan cần TaiSan)
-├── CREATE TABLE HopDong            + GO
-├── CREATE TABLE HopDong_TaiSan     + GO
-├── CREATE TABLE LichSuGiaoDich     + GO
-├── INSERT Sample Data (NhanVien, KhachHang, TaiSan) + GO
-├── CREATE FUNCTION fn_CalcMoney_Transaction  + GO   ← Function đơn giản trước
-├── CREATE FUNCTION fn_CalcMoneyContract      + GO   ← Phụ thuộc fn_CalcMoney_Transaction
-├── CREATE PROCEDURE sp_TiepNhanHopDong       + GO
-├── CREATE PROCEDURE sp_XuLyTraNo             + GO   ← Phụ thuộc fn_CalcMoneyContract
-├── CREATE PROCEDURE sp_GiaHanHopDong         + GO   ← Phụ thuộc fn_CalcMoneyContract
-├── CREATE TRIGGER trg_AutoQuaHan             + GO
-├── CREATE TRIGGER trg_AutoSanSangThanhLy     + GO
-├── CREATE TRIGGER trg_AutoDaBanThanhLy       + GO
-└── EXEC sp_TiepNhanHopDong (Insert sample contracts) + GO
-```
-
-> **Lưu ý quan trọng:** Trong T-SQL, mỗi `CREATE FUNCTION`, `CREATE PROCEDURE`, `CREATE TRIGGER` **phải là câu lệnh đầu tiên trong batch**. Luôn đặt `GO` ngay trước mỗi khối `CREATE` để đảm bảo batch mới bắt đầu đúng.
-
-![Màn hình SSMS sau khi chạy toàn bộ script thành công](./images/run_script_success.png)
-
----
-
-## Tổng kết
-
-| Hạng mục | Nội dung đã hoàn thành |
-|---|---|
-| **ERD** | Sơ đồ 5 thực thể với đầy đủ PK, FK, quan hệ 1-N và N-N |
-| **Chuẩn hóa** | Đạt 3NF — không phụ thuộc bộ phận, không phụ thuộc bắc cầu |
-| **DDL** | T-SQL chuẩn SQL Server: `IDENTITY`, `CHECK CONSTRAINT`, `FOREIGN KEY`, `DEFAULT GETDATE()` |
-| **Event 1** | `sp_TiepNhanHopDong` — Tạo hợp đồng, liên kết tài sản qua `STRING_SPLIT`, thiết lập deadline bằng `DATEADD` |
-| **Event 2** | `fn_CalcMoney_Transaction`, `fn_CalcMoneyContract` — Lãi đơn/kép dùng `POWER()`, `DATEDIFF(DAY,...)`, `DATEADD()` |
-| **Event 3** | `sp_XuLyTraNo` — Xử lý trả nợ với `BEGIN TRY/CATCH`, ghi Audit Log, gợi ý rút tài sản |
-| **Event 4** | Query nợ xấu dùng `FORMAT(..., 'N0')`, dự phóng 30 ngày qua `DATEADD + fn_CalcMoneyContract` |
-| **Event 5** | 3 Triggers dùng `inserted`/`deleted`, set-based logic, điều kiện `deleted.TrangThai <> ...` chống lặp |
-| **Gia hạn** | `sp_GiaHanHopDong` — Trả lãi, dời deadline, ghi log dùng `CONVERT(..., 103)` |
-| **Audit Log** | Bảng `LichSuGiaoDich` ghi đầy đủ mọi giao dịch tiền tệ, truy vết dòng tiền |
-
----
 
 *Báo cáo được viết bởi [Họ tên sinh viên] — MSSV: [MSSV] — Lớp 59KMT*
