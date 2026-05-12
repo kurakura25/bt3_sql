@@ -1313,5 +1313,3 @@ Lịch sử hợp đồng (Audit Log)
 Bảng lịch sử hiển thị từng giao dịch theo thứ tự thời gian. Tính đúng đắn xác minh được bằng bất biến: `DuNoSau` của dòng thứ n phải bằng `DuNoTruoc` của dòng thứ n+1. Cột `LoaiGiaoDich` phân biệt rõ `'Tra no'`, `'Gia han'` và `'Thanh ly'`.
 
 
-
-*Báo cáo được viết bởi [Họ tên sinh viên] — MSSV: [MSSV] — Lớp 59KMT*
